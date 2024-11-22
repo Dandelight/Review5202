@@ -48,6 +48,7 @@ pip install -r requirements.txt
 ```
 
 Required packages:
+
 - `scholarly`
 - `aiohttp`
 - `aiofiles`
@@ -59,12 +60,27 @@ Required packages:
 ## 🔑 API Keys
 
 Required API keys:
+
 - Anthropic API key for Claude (for summarization)
 
 Set up your API key:
 
 ```bash
 export ANTHROPIC_API_KEY='your-api-key-here'
+```
+
+Or I recommend you create a `.env` file and write the keys in it like:
+
+```shell
+ANTHROPIC_API_KEY=sk-this-is-your-api-key
+# base_url defaults to the official API
+# ANTHROPIC_BASE_URL=https://example.com
+```
+
+and run it using [`dotenvx`](https://github.com/dotenvx/dotenvx):
+
+```shell
+dotenvx run -- python summarize_papers.py
 ```
 
 ## 🚀 Usage

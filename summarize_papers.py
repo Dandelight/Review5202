@@ -8,34 +8,30 @@ from tqdm import tqdm
 
 
 class DocumentSummarizer:
+
     def __init__(
         self,
         input_dir: str = "markdown/pypdf",
         output_dir: str = "summaries",
-        api_key: str = None,
+        api_key: str | None = None,
     ):
         self.input_dir = Path(input_dir)
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
 
         # Initialize Claude client
-        self.client = anthropic.Anthropic(
+        self.client = anthropic.AsyncAnthropic(
             api_key=api_key or os.getenv("ANTHROPIC_API_KEY")
         )
 
-        # System prompt for summarization
-        self.system_prompt = """
-        You are a research paper summarizer. For each paper, provide a structured summary with:
-
-        1. Title
-        2. Key Points (3-5 bullet points)
-        3. Main Contributions
-        4. Methodology
-        5. Results and Conclusions
-        6. Future Work
-
-        Keep the summary concise but informative. Focus on technical details and novel contributions.
-        """
+        # Load system prompt from file
+        prompt_path = Path("Thinking-Claude/model_instructions/v4-20241118.md")
+        try:
+            with open(prompt_path, "r", encoding="utf-8") as f:
+                self.system_prompt = f.read()
+        except Exception as e:
+            print(f"Error loading system prompt from {prompt_path}: {e}")
+            raise
 
     async def read_markdown(self, file_path: Path) -> str:
         """Read content from markdown file."""
@@ -60,7 +56,7 @@ class DocumentSummarizer:
         """Generate summary using Claude API."""
         try:
             message = await self.client.messages.create(
-                model="claude-3-sonnet-20240229",
+                model="claude-3-5-sonnet-20240620",
                 max_tokens=4096,
                 temperature=0.3,
                 system=self.system_prompt,
@@ -98,16 +94,22 @@ class DocumentSummarizer:
             return False
 
     async def process_all_documents(self):
-        """Process all markdown documents in the input directory."""
+        """Process all markdown documents in the input directory concurrently."""
         markdown_files = list(self.input_dir.glob("*.md"))
 
         if not markdown_files:
             print(f"No markdown files found in {self.input_dir}")
             return
 
+        # Create tasks for all documents
+        tasks = [
+            self.process_single_document(file_path) for file_path in markdown_files
+        ]
+
+        # Process all documents concurrently with progress bar
         with tqdm(total=len(markdown_files), desc="Summarizing documents") as pbar:
-            for file_path in markdown_files:
-                success = await self.process_single_document(file_path)
+            results = await asyncio.gather(*tasks)
+            for file_path, success in zip(markdown_files, results):
                 if success:
                     print(f"Successfully summarized: {file_path.name}")
                 else:
@@ -134,10 +136,10 @@ class DocumentSummarizer:
 
 
 async def main():
-    # Initialize summarizer
+    # Initialize summarizer with configurable batch size
     summarizer = DocumentSummarizer()
 
-    # Process all documents
+    # Process all documents concurrently
     await summarizer.process_all_documents()
 
     # Generate index
