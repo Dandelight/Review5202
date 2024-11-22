@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     PAPERS_DIR: Path = DATA_DIR / "papers"
     MARKDOWN_DIR: Path = DATA_DIR / "markdown"
     SUMMARIES_DIR: Path = DATA_DIR / "summaries"
+    PROMPT_PATH: Path = BASE_DIR / "Thinking-Claude/model_instructions/v4-20241118.md"
 
     # LLM Settings
     MODEL_NAME: str = "claude-3-sonnet-20240229"
