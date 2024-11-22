@@ -1,4 +1,6 @@
-# Academic Paper Processing Pipeline
+# Review 5202
+
+> Still searching link-by-link and reading line-by-line to compose a review in 5202?
 
 A comprehensive Python-based pipeline for collecting, downloading, and analyzing academic papers, with a focus on LLM and Security research papers.
 
@@ -187,11 +189,5 @@ MIT License
 
 ## 🙏 Acknowledgments
 
-- Google Scholar
-- Anthropic's Claude
-- Nougat OCR
-- PyPDF2
-
-
-This README provides a comprehensive overview of the project, its components, setup instructions, and usage guidelines. You might want to adjust specific details based on your actual implementation and requirements.
-
+- [Thinking-Claude](https://github.com/richards199999/Thinking-Claude)
+- [dblp-api](https://github.com/alumik/dblp-api)
